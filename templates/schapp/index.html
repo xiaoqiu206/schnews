@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/static/schapp/css/xjspider.css">
+    <title>女院微讯--首页</title>
+    <script>
+        function login_register() {
+            document.getElementsByClassName('overlay')[0].style.display = 'block';
+            document.getElementsByClassName('loginbox')[0].style.display = 'block';
+        }
+
+        function login() {
+            var stunum = document.getElementById('stunum').value;
+            var password = document.getElementById('password').value;
+            
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data = xmlhttp.responseText;
+                    if (data.split(':')[0] == 'error') {
+                        document.getElementById('msg').innerHTML = data.split(':')[1];
+                    } else {
+                        window.location.href = '/newsList';
+                    }
+                }
+            };
+            url = '/login?stunum=' + stunum + '&password=' + password;
+            xmlhttp.open('GET', url, true);
+            xmlhttp.send();
+
+        }
+
+        function register() {
+            var stunum = document.getElementById('stunum').value;
+            var password = document.getElementById('password').value;
+            console.log('dog1');
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data = xmlhttp.responseText;
+                    if (data.split(':')[0] == 'error') {
+                        document.getElementById('msg').innerHTML = data.split(':')[1];
+                    } else {
+                        window.location.href = '/registerSuccess';
+                    }
+                }
+            };
+            url = '/register?stunum=' + stunum + '&password=' + password;
+            xmlhttp.open('GET', url, true);
+            xmlhttp.send();
+
+        }
+    </script>
+</head>
+
+<body>
+    <!-- header -->
+    <div class="header">
+        <div class="logo"><a href="#">logo</a>
+        </div>
+        <div class="nav">
+            <ul>
+                <li><a href="#">首页</a>
+                </li>
+                <li><a href="#" target="_blank">最新</a>
+                </li>
+            </ul>
+        </div>
+        <!-- 用户未登录 -->
+        <div class="nologin" style="display:block;">
+            <ul>
+                <li><a onclick='login_register();' href="#">登陆</a>
+                </li>
+                <li><a onclick="login_register();" href="#">注册</a>
+                </li>
+            </ul>
+        </div>
+        <!-- 用户未登录 end -->
+        <!-- 用户登陆成功 -->
+        <div class="suclogin" style="display:none;"><i class="stunum">110501059</i>欢迎使用女院微讯</div>
+        <!-- 用户登陆成功 end -->
+    </div>
+    <!-- header end -->
+    <!-- main -->
+    <div class="main">
+        <!-- 查询输入框 -->
+        <div class="search">
+            <input name="" type="text" class="inputBox" value="" placeholder="输入关键字" />
+            <a href="#" title="" class="sendIco">搜索</a>
+        </div>
+        <!-- 查询输入框 end -->
+        <!-- keywordlist -->
+        <div class="keywordlist">
+            <ul>
+                <li><a href="#" target="_blank">选课</a>
+                </li>
+                <li><a href="#" target="_blank">重修</a>
+                </li>
+                <li><a href="#" target="_blank">四六级</a>
+                </li>
+                <li><a href="#" target="_blank">假期安排</a>
+                </li>
+                <li><a href="#" target="_blank">期末考试</a>
+                </li>
+                <li><a href="#" target="_blank">比赛通知</a>
+                </li>
+                <li><a href="#" target="_blank">征文活动</a>
+                </li>
+            </ul>
+        </div>
+        <!-- keywordlist end-->
+    </div>
+    <!-- main end -->
+    <!-- footer -->
+    <div class="footer"></div>
+    <!-- footer end -->
+    <!-- 遮罩层 -->
+    <div class="overlay" style="display:none;"></div>
+    <!-- 遮罩层 -->
+    <!-- 登陆层 -->
+    <div class="loginbox" style="display:none;">
+        <label>学号：</label>
+        <input type="text" id='stunum' value="" placeholder="请输入学号" class="inputBox" />
+        </br>
+        <label>密码：</label>
+        <input type="password" id='password' value="" placeholder="请输入密码" class="inputBox" />
+        </br>
+       <p id="msg">{{ msg }}</p>
+        <a href="javascript:;" title="" onclick='login();' class="loginBtn sendIco">登陆</a>
+        </br>
+        <a href="javascript:;" title="" onclick='register();' class="loginBtn sendIco">注册</a>
+    </div>
+    <!-- 登陆层 end-->
+</body>
+
+</html>

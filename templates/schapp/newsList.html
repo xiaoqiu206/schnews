@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/static/schapp/css/xjspider.css">
+    <title>女院微讯--个人主页</title>
+
+    <script>
+        function handle(data) { //处理ajax返回的数据
+            data = JSON.parse(data)
+            document.getElementById('totalNums').innerHTML = data.total_num;
+            document.getElementById('totalPages').innerHTML = data.total_pages;
+            if (data.page_up) { // 如果有上一页
+                document.getElementById('page_up').onclick = function() {
+                    load_json(data.previous_page)
+                };
+            }
+            if (data.page_down) { // 如果有下一页
+                document.getElementById('page_down').onclick = function() {
+                    load_json(data.next_page)
+                };
+            }
+            var data_list = eval(data.data_list);
+            len = data_list.length;
+            for (var n = 0; n < len; n++) {
+                console.log(data_list[n]['fields']);
+                document.getElementById('list_table').innerHTML += "<tr><td><a href='" + data_list[n]['fields']['links'] + " target='_blank'>" + data_list[n]['fields']['title'] + "</a></td><td>" + data_list[n]['fields']['rel_time'] + "</td><td>" + data_list[n]['fields']['section'] + "</td></tr>";
+
+            }
+        }
+
+        function load_json(page) {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data = xmlhttp.responseText;
+                    console.log(data);
+                    handle(data);
+                }
+            };
+            url = '/ajax_list';
+            xmlhttp.open('GET', url, true);
+            xmlhttp.send();
+        }
+    </script>
+
+</head>
+
+<body onload='load_json(1);'>
+    <!-- header -->
+    <div class="header">
+        <div class="logo"><a href="#">logo</a>
+        </div>
+        <div class="nav">
+            <ul>
+                <li><a href="#">首页</a>
+                </li>
+                <li><a href="/newsList" target="_self">最新</a>
+                </li>
+            </ul>
+        </div>
+        <!-- 查询输入框 -->
+        <div class="serchtop search">
+            <input name="" type="text" class="inputBox" value="" placeholder="输入关键字" />
+            <a href="#" title="" class="sendIco">搜索</a>
+        </div>
+        <!-- 查询输入框 end -->
+        <!-- 用户登陆成功 -->
+        <div class="suclogin"><i class="stunum">{{ stunum }}</i>欢迎使用女院微讯</div>
+        <!-- 用户登陆成功 end -->
+    </div>
+    <!-- header end -->
+    <!-- main -->
+    <div class="main">
+        <!-- 搜索新闻列表页 -->
+        <div class="newslist">
+            <!-- <h1>所关注微讯</h1> -->
+            <!-- 时间查询输入框 -->
+            <div class="timesearch search">
+                <input name="" type="text" class="inputBox" value="" placeholder="输入起始时间" />
+                <span class="line">--</span>
+                <input name="" type="text" class="inputBox" value="" placeholder="输入截止时间" />
+                <a href="#" title="" class="sendIco">搜索</a>
+            </div>
+            <!-- 时间查询输入框 end -->
+            <!-- 部门查询选择框 -->
+            <div class="sectionsearch">
+                <select>
+                    <option value="">选择部门</option>
+                    <option value="校办">校办</option>
+                    <option value="组织部">组织部</option>
+                    <option value="宣传部">宣传部</option>
+                    <option value="纪监审">纪监审</option>
+                    <option value="人事处">人事处</option>
+                    <option value="财务处">财务处</option>
+                    <option value="教务处">教务处</option>
+                    <option value="研究生处">研究生处</option>
+                    <option value="科研处">科研处</option>
+                    <option value="外事办">外事办</option>
+                    <option value="学生处">学生处</option>
+                    <option value="招生就业">招生就业</option>
+                    <option value="后勤处">后勤处</option>
+                    <option value="国资处">国资处</option>
+                    <option value="基建处">基建处</option>
+                    <option value="保卫部">保卫部</option>
+                    <option value="离退办">离退办</option>
+                    <option value="工会">工会</option>
+                    <option value="团委">团委</option>
+                    <option value="现教中心">现教中心</option>
+                    <option value="图书馆">图书馆</option>
+                    <option value="学报">学报</option>
+                    <option value="北校区">北校区</option>
+                    <option value="发展学院">发展学院</option>
+                    <option value="法学院">法学院</option>
+                    <option value="管理学院">管理学院</option>
+                    <option value="教育学院">教育学院</option>
+                    <option value="艺术学院">艺术学院</option>
+                    <option value="高职学院">高职学院</option>
+                    <option value="继教院">继教院</option>
+                    <option value="计算机系">计算机系</option>
+                    <option value="外语系">外语系</option>
+                    <option value="金融系">金融系</option>
+                    <option value="汉语国际">汉语国际</option>
+                    <option value="思政部">思政部</option>
+                    <option value="体育部">体育部</option>
+                </select>
+            </div>
+            <!-- 部门查询选择框 end -->
+            <!-- 搜索选项列 -->
+            <div class="selector-set">
+                <div class="selector-item">
+                    <b>关键字：</b>
+                    <em>最新</em>
+                    <a href="#"><i></i></a>
+                </div>
+                <div class="selector-item">
+                    <b>时间：</b>
+                    <em>2015-4-20--2015-5-1</em>
+                    <a href="#"><i></i></a>
+                </div>
+                <div class="selector-item">
+                    <b>部门：</b>
+                    <em>计算机系</em>
+                    <a href="#"><i></i></a>
+                </div>
+            </div>
+            <!-- 搜索选项列 end -->
+            <!-- 新闻列表 -->
+            <div class="searchnewslist">
+                <table width="1000px" border="0" cellspacing="0" cellpadding="0" class="tableDataInfor" id='list_table'>
+                    <tr>
+                        <th width="75%"></th>
+                        <th width="15%"></th>
+                        <th width="10%"></th>
+                    </tr>
+
+                </table>
+                <!-- 新闻列表 end-->
+                <p>共计<em id='totalNums'></em>条|每页10条|共计<em id='totalPages'></em>页|<a href="#">首页</a>|<a id='page_up' href="javascript:;">上一页</a>|<a id='page_down' href="javascript:;">下一页</a>|<a href="#">尾页</a>
+                </p>
+            </div>
+        </div>
+        <!-- 搜索新闻列表页 end-->
+        <!-- keywordlist -->
+        <div class="keywordlist">
+            <ul>
+                <li><a href="#" target="_blank">选课</a>
+                </li>
+                <li><a href="#" target="_blank">重修</a>
+                </li>
+                <li><a href="#" target="_blank">四六级</a>
+                </li>
+                <li><a href="#" target="_blank">假期安排</a>
+                </li>
+                <li><a href="#" target="_blank">期末考试</a>
+                </li>
+                <li><a href="#" target="_blank">比赛通知</a>
+                </li>
+                <li><a href="#" target="_blank">征文活动</a>
+                </li>
+            </ul>
+        </div>
+        <!-- keywordlist end-->
+    </div>
+    <!-- main end -->
+    <!-- footer -->
+    <div class="footer"></div>
+    <!-- footer end -->
+</body>
+
+</html>
