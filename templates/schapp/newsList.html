@@ -7,10 +7,53 @@
     <title>女院微讯--个人主页</title>
 
     <script>
+        function zhuantiSelect(obj) {
+            if (document.getElementById('search_zhuanti')) { // 如果搜索条件里已经有部门,则改变部门条件
+                document.getElementById('search_zhuanti').children[1].innerHTML = obj.innerHTML;
+            } else { // 如果搜索条件里没有部门,则添加
+                document.getElementById('search_div').innerHTML += "<div class='selector-item' id='search_zhuanti'><b>专题：</b><em>" + obj.innerHTML + "</em><a onclick='deleteObj(this);' href='#'><i></i></a></div>";
+            }
+            load_json(1);
+        }
+
+        function departmentSelect(obj) {
+            // console.log(obj.value);
+            if (document.getElementById('search_department')) { // 如果搜索条件里已经有部门,则改变部门条件
+                document.getElementById('search_department').children[1].innerHTML = obj.value;
+            } else { // 如果搜索条件里没有部门,则添加
+                document.getElementById('search_div').innerHTML += "<div class='selector-item' id='search_department'><b>部门：</b><em>" + obj.value + "</em><a onclick='deleteObj(this);' href='#'><i></i></a></div>";
+            }
+            load_json(1);
+        }
+
+        function dateSelect() {
+            if (document.getElementById('search_date')) { // 如果搜索条件里已经有时间,则改变时间条件
+                document.getElementById('search_date').children[1].innerHTML = document.getElementById('startDate').value + '--' + document.getElementById('endDate').value;
+            } else { // 如果搜索条件里没有时间,则添加
+                document.getElementById('search_div').innerHTML += "<div class='selector-item' id='search_date'><b>时间：</b><em>" + document.getElementById('startDate').value + '--' + document.getElementById('endDate').value + "</em><a onclick='deleteObj(this);' href='#'><i></i></a></div>";
+            }
+            load_json(1);
+        }
+
+        function keywordSelect() {
+            if (document.getElementById('search_keyword')) { // 如果搜索条件里已经有关键字,则改变关键字条件
+                document.getElementById('search_keyword').children[1].innerHTML = document.getElementById('keyword').value;
+            } else { // 如果搜索条件里没有关键字,则添加
+                document.getElementById('search_div').innerHTML += "<div class='selector-item' id='search_keyword'><b>关键字：</b><em>" + document.getElementById('keyword').value + "</em><a onclick='deleteObj(this);' href='#'><i></i></a></div>";
+            }
+            load_json(1);
+        }
+
+        function deleteObj(obj) { // 删除元素,删除搜索条件
+            obj.parentNode.parentNode.removeChild(obj.parentNode);
+            load_json(1);
+        }
+
         function handle(data) { //处理ajax返回的数据
             data = JSON.parse(data)
             document.getElementById('totalNums').innerHTML = data.total_num;
             document.getElementById('totalPages').innerHTML = data.total_pages;
+            document.getElementById('cur_page').innerHTML = data.wanted_page;
             if (data.page_up) { // 如果有上一页
                 document.getElementById('page_up').onclick = function() {
                     load_json(data.previous_page)
@@ -23,8 +66,9 @@
             }
             var data_list = eval(data.data_list);
             len = data_list.length;
+            document.getElementById('list_table').innerHTML = '';
             for (var n = 0; n < len; n++) {
-                console.log(data_list[n]['fields']);
+                // console.log(data_list[n]['fields']);
                 document.getElementById('list_table').innerHTML += "<tr><td><a href='" + data_list[n]['fields']['links'] + " target='_blank'>" + data_list[n]['fields']['title'] + "</a></td><td>" + data_list[n]['fields']['rel_time'] + "</td><td>" + data_list[n]['fields']['section'] + "</td></tr>";
 
             }
@@ -35,13 +79,28 @@
             xmlhttp.onreadystatechange = function() {
                 if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                     var data = xmlhttp.responseText;
-                    console.log(data);
+                    //   console.log(data);
                     handle(data);
                 }
             };
-            url = '/ajax_list';
+            search_condition = getSearchCondition();
+            url = '/ajax_list?page=' + page + search_condition;
             xmlhttp.open('GET', url, true);
             xmlhttp.send();
+        }
+
+        function getSearchCondition() {
+            search_condition = '';
+            if (keyword_div = document.getElementById('search_keyword'))
+                search_condition += '&key_word=' + keyword_div.children[1].innerHTML;
+            if (date_div = document.getElementById('search_date'))
+                search_condition += '&date=' + date_div.children[1].innerHTML;
+            if (department_div = document.getElementById('search_department'))
+                search_condition += '&department=' + department_div.children[1].innerHTML;
+            if (zhuanti_div = document.getElementById('search_zhuanti'))
+                search_condition += '&zhuanti=' + zhuanti_div.children[1].innerHTML;
+            // console.log(search_condition);
+            return search_condition;
         }
     </script>
 
@@ -62,8 +121,8 @@
         </div>
         <!-- 查询输入框 -->
         <div class="serchtop search">
-            <input name="" type="text" class="inputBox" value="" placeholder="输入关键字" />
-            <a href="#" title="" class="sendIco">搜索</a>
+            <input name="" type="text" class="inputBox" value="" placeholder="输入关键字" id='keyword' />
+            <a href="#" title="" class="sendIco" onclick="keywordSelect();">搜索</a>
         </div>
         <!-- 查询输入框 end -->
         <!-- 用户登陆成功 -->
@@ -78,15 +137,15 @@
             <!-- <h1>所关注微讯</h1> -->
             <!-- 时间查询输入框 -->
             <div class="timesearch search">
-                <input name="" type="text" class="inputBox" value="" placeholder="输入起始时间" />
+                <input name="" type="text" class="inputBox" value="" placeholder="输入起始时间" id='startDate' />
                 <span class="line">--</span>
-                <input name="" type="text" class="inputBox" value="" placeholder="输入截止时间" />
-                <a href="#" title="" class="sendIco">搜索</a>
+                <input name="" type="text" class="inputBox" value="" placeholder="输入截止时间" id='endDate' />
+                <a href="#" title="" class="sendIco" onclick='dateSelect();'>搜索</a>
             </div>
             <!-- 时间查询输入框 end -->
             <!-- 部门查询选择框 -->
             <div class="sectionsearch">
-                <select>
+                <select onchange='departmentSelect(this);'>
                     <option value="">选择部门</option>
                     <option value="校办">校办</option>
                     <option value="组织部">组织部</option>
@@ -128,22 +187,23 @@
             </div>
             <!-- 部门查询选择框 end -->
             <!-- 搜索选项列 -->
-            <div class="selector-set">
-                <div class="selector-item">
+            <div class="selector-set" id='search_div'>
+                <!--
+                <div class="selector-item" id='search_keyword'>
                     <b>关键字：</b>
                     <em>最新</em>
                     <a href="#"><i></i></a>
                 </div>
-                <div class="selector-item">
+                <div class="selector-item" id='search_date'>
                     <b>时间：</b>
                     <em>2015-4-20--2015-5-1</em>
                     <a href="#"><i></i></a>
                 </div>
-                <div class="selector-item">
+                <div class="selector-item" id='search_department'>
                     <b>部门：</b>
                     <em>计算机系</em>
                     <a href="#"><i></i></a>
-                </div>
+                </div>  -->
             </div>
             <!-- 搜索选项列 end -->
             <!-- 新闻列表 -->
@@ -157,7 +217,7 @@
 
                 </table>
                 <!-- 新闻列表 end-->
-                <p>共计<em id='totalNums'></em>条|每页10条|共计<em id='totalPages'></em>页|<a href="#">首页</a>|<a id='page_up' href="javascript:;">上一页</a>|<a id='page_down' href="javascript:;">下一页</a>|<a href="#">尾页</a>
+                <p>共计<em id='totalNums'></em>条|每页10条|共计<em id='totalPages'></em>页|<a href="#">首页</a>|<a id='page_up' href="javascript:;">上一页</a>| 现在第 <em id='cur_page'></em> 页|<a id='page_down' href="javascript:;">下一页</a>|<a href="#">尾页</a>
                 </p>
             </div>
         </div>
@@ -165,19 +225,19 @@
         <!-- keywordlist -->
         <div class="keywordlist">
             <ul>
-                <li><a href="#" target="_blank">选课</a>
+                <li><a href="javascript:;" onclick='zhuantiSelect(this);'>选课</a>
                 </li>
-                <li><a href="#" target="_blank">重修</a>
+                <li><a href="javascript:;" onclick='zhuantiSelect(this);'>重修</a>
                 </li>
-                <li><a href="#" target="_blank">四六级</a>
+                <li><a href="javascript:;" onclick='zhuantiSelect(this);'>四六级</a>
                 </li>
-                <li><a href="#" target="_blank">假期安排</a>
+                <li><a href="javascript:;" onclick='zhuantiSelect(this);'>假期安排</a>
                 </li>
-                <li><a href="#" target="_blank">期末考试</a>
+                <li><a href="javascript:;" onclick='zhuantiSelect(this);'>期末考试</a>
                 </li>
-                <li><a href="#" target="_blank">比赛通知</a>
+                <li><a href="javascript:;" onclick='zhuantiSelect(this);'>比赛通知</a>
                 </li>
-                <li><a href="#" target="_blank">征文活动</a>
+                <li><a href="javascript:;" onclick='zhuantiSelect(this);'>征文活动</a>
                 </li>
             </ul>
         </div>

@@ -61,10 +61,26 @@ def ajax_list(request):
     if request.session['stunum']:  # 已经登录
         print request.session['stunum']
         news = News.objects.all()
-        # print news
-        reDict = utils.get_page(news, 10, 1)
+        if 'date' in request.GET:
+            date = request.GET['date']
+            startDate = date.split('--')[0]
+            endDate = date.split('--')[1]
+            # print startDate, endDate
+            news = news.filter(rel_time__gte=startDate)  # 大于等于开始日期
+            news = news.filter(rel_time__lte=endDate)  # 小于等于结束日期
+        # 加len(news) >0 的原因是,如果之前过滤后就没有数据了,其他条件就不用过滤了
+        if len(news) > 0 and 'key_word' in request.GET:
+            keyword = request.GET['key_word']
+            news = news.filter(title__contains=keyword)
+        if len(news) > 0 and 'department' in request.GET:
+            department = request.GET['department']
+            news = news.filter(section=department)
+        if len(news) > 0 and 'zhuanti' in request.GET:
+            zhuanti = request.GET['zhuanti']
+            news = utils.handle_zhuanti(zhuanti, news)
+        reDict = utils.get_page(news, 10, request.GET['page'])
         # reDict['data_list'] = json.dumps(reDict['data_list'])
-        #print reDict#['data_list']
+        # print reDict#['data_list']
         return HttpResponse(json.dumps(reDict), content_type='application/json')
     else:
         return HttpResponse(u'error')
